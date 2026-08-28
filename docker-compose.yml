@@ -1,0 +1,28 @@
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - auth-platform-mongo:/data/db
+
+  backend:
+    build: ./backend
+    environment:
+      MONGO_URI: mongodb://mongo:27017/auth-platform
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set a real secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set a different real secret}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8082:80"
+    depends_on:
+      - backend
+
+volumes:
+  auth-platform-mongo:
